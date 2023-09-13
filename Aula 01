@@ -1,0 +1,55 @@
+library(nleqslv)### funçao para resolver problemas nao lineares
+library(mass)
+install.packages("nleqslv")
+
+
+#####Aula Bayesiana### 13/09
+
+####distrubuiçao
+L= function(theta,soma,n) theta^soma*(1-theta)^(n-soma)
+prior.f= function(theta) 1/sqrt(theta*(1-theta))
+pos= function(theta,a,b) {theta^(a-1)*(1- theta)^(b-1)/beta(a,b)}
+
+beta(4,6)
+
+####curvas
+curve(pos(theta,a=2+0.5,20-2+0.5), from=0, to=1,xname="theta")
+curve(2000* L(theta,2,20), from=0, to=1,xname="theta", add = TRUE)
+curve(prior.f(theta), from=0, to=1,xname="theta",add=TRUE)
+
+##rascunho
+integrate(prior.f,0,1)
+
+#######modelo Bernoulli - Beta com priori informativa
+
+#Agora suponha que um escpecialista afirma que a média a prior 0.7 e que a variancia é 
+#0.005, assim temos uma priori informativa a partir dessas informaçoes.
+# Precisamos encontrar os hiper - parâmetros a e b da distribuiçao Beta
+
+target  <- function(x,c,d)
+{
+   y<- numeric(2)
+   y[1]<- x[1]/(x[1] + x[2])-c
+  
+  y[2]<- x[1]*x[2]/(x[1] + x[2])^2*((x[1] + x[2] +1))- d
+  
+  y
+  
+}
+
+xstart=c(5,5)
+
+par=nleqslv(xstart,target,c=0.7, d=0.005, method = "Newton")
+
+a.st=par$x[1]
+b.st=par$x[2]
+
+
+####curvas
+curve(pos(theta,a=2+a.st,20-2+b.st), from=0, to=1,xname="theta")###posteriori
+curve(1000* L(theta,2,20), from=0, to=1,xname="theta", add = TRUE)##verossimilhanca
+curve(dbeta(x,shape1 = 28.7, shape2 = 12.3)### priori
+
+
+
+
